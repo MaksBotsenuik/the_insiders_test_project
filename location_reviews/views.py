@@ -1,4 +1,4 @@
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -9,16 +9,15 @@ from rest_framework.filters import SearchFilter
 from .models import Location, LocationCategories, Review
 from .serializers import LocationCategoriesSerializer, LocationSerializer, ReviewSerializer
 import pandas as pd
-from .permissions import IsOwnerOrAdmin, IsAuthenticatedOrAdminForUnsafe
+from .permissions import IsAuthenticatedOrAdminForUnsafe, IsAuthenticatedOrAdminOwnerForUnsafe
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
-
 
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [IsAuthenticatedOrAdminOwnerForUnsafe]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     filter_backends = [DjangoFilterBackend, SearchFilter] 
     filterset_fields = ['rating', 'categories']
@@ -56,7 +55,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [IsAuthenticatedOrAdminOwnerForUnsafe]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
 
     @method_decorator(cache_page(60*5))

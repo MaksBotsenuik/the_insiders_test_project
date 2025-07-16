@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from .models import Location, LocationCategories, Review, Address
-from django.contrib.auth.models import User
 
 class LocationCategoriesSerializer(serializers.ModelSerializer):
     class Meta:
