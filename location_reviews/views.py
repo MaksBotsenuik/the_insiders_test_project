@@ -9,7 +9,9 @@ from rest_framework.filters import SearchFilter
 from .models import Location, LocationCategories, Review
 from .serializers import LocationCategoriesSerializer, LocationSerializer, ReviewSerializer
 import pandas as pd
-from .permissions import IsOwnerOrAdmin
+from .permissions import IsOwnerOrAdmin, IsAuthenticatedSafeMethod
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 
 class LocationViewSet(viewsets.ModelViewSet):
@@ -21,6 +23,11 @@ class LocationViewSet(viewsets.ModelViewSet):
     filterset_fields = ['rating', 'categories']
     search_fields = ['=name', 'description']
 
+    @method_decorator(cache_page(60*5))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @method_decorator(cache_page(60*5))
     @action(detail=False, methods=['get'])
     def export(self, request):
         export_format = request.query_params.get('type', 'json')
@@ -51,6 +58,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
 
+    @method_decorator(cache_page(60*5))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
         review = self.get_object()
@@ -69,5 +80,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = LocationCategories.objects.all()
     serializer_class = LocationCategoriesSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticatedSafeMethod, IsAdminUser]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
+
+    @method_decorator(cache_page(60*5))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
