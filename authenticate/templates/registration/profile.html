@@ -1,0 +1,12 @@
+{% extends 'registration/base.html' %}
+{% block content %}
+  <h2>Профіль користувача</h2>
+  <ul>
+    <li><strong>Ім'я користувача:</strong> {{ user.username }}</li>
+    <li><strong>Email:</strong> {{ user.email }}</li>
+  </ul>
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Вийти</button>
+  </form>
+{% endblock %} 
