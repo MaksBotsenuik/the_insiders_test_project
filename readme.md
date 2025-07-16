@@ -20,6 +20,8 @@
    ```
 2. **Встановити залежності:**
    ```sh
+   python -m venv venv
+   venv/Scripts/Activate
    pip install -r requirments.txt
    ```
 3. **Запустити Redis через Docker Compose:**
@@ -59,6 +61,10 @@
 - `POST /api/v1/review/<id>/like/` — лайк
 - `POST /api/v1/review/<id>/dislike/` — дизлайк
 - `GET /api/v1/location/export/?type=csv` — експорт локацій у CSV (кешується)
+- `GET /api/v1/location/export/` — експорт локацій у JSON (кешується)
+- `GET /api/v1/location/?` — експорт локацій у CSV (кешується)
+- `GET /api/v1/location/?rating=5&categories=1` - поверне всі локації з рейтингом 5 і категорією 1
+- `GET /api/v1/location/?search=Парк` - Пошук по назві або опису (згідно з search_fields: '=name', 'description').
 
 ### Аутентифікація
 - Реєстрація: `/accounts/register/`
