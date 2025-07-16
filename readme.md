@@ -1,106 +1,89 @@
 # Location Reviews API
 
-A Django REST Framework project for managing locations, categories, and user reviews with like/dislike functionality.
+**Location Reviews API** — це Django REST Framework застосунок для керування локаціями, категоріями та відгуками користувачів із системою лайків/дизлайків. Підтримує кешування через Redis та зберігання даних у Postgres.
 
-## Features
+## Можливості
+- CRUD для локацій, категорій, адрес та відгуків
+- Одна оцінка від користувача на локацію
+- Лайки/дизлайки для відгуків
+- Фільтрація та пошук локацій
+- Пагінація
+- Аутентифікація користувачів
+- Кешування списку локацій та експорту через Redis
 
-- CRUD for Locations, Categories, Addresses, and Reviews
-- Many-to-many relationship between Locations and Categories
-- Users can leave one review per location
-- Like/Dislike system for reviews
-- Filtering locations by rating and categories
-- Search locations by name and description
-- Pagination for all list endpoints
-- Authenticated API access
+## Швидкий старт
 
-## Quick Start
+1. **Клонувати репозиторій:**
+   ```sh
+   git clone <your-repo-url>
+   cd inseders_test_task
+   ```
+2. **Встановити залежності:**
+   ```sh
+   pip install -r requirments.txt
+   ```
+3. **Запустити Redis через Docker Compose:**
+   ```sh
+   docker compose up -d
+   ```
+   > Це підніме лише Redis (порт 6379).
+4. **Запустити Postgres (локально або через власний контейнер).**
+   > Приклад для локального запуску Postgres:
+   > - Створіть БД, користувача та пароль відповідно до налаштувань у settings.py або змінних середовища.
+5. **Застосувати міграції:**
+   ```sh
+   python manage.py migrate
+   ```
+6. **Створити суперкористувача:**
+   ```sh
+   python manage.py createsuperuser
+   ```
+7. **Запустити сервер Django:**
+   ```sh
+   python manage.py runserver
+   ```
 
-### 1. Clone the repository
+---
 
-```sh
-git clone <your-repo-url>
-cd inseders_test_task
-```
+## API
 
-### 2. Install dependencies
+- **Swagger:** [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+- **Redoc:** [http://localhost:8000/redoc/](http://localhost:8000/redoc/)
 
-```sh
-pip install -r requirements.txt
-```
+### Основні ендпоінти
+- `GET /api/v1/location/` — список локацій (кешується)
+- `POST /api/v1/location/` — створити локацію
+- `GET /api/v1/category/` — список категорій
+- `GET /api/v1/review/` — список відгуків
+- `POST /api/v1/review/` — залишити відгук
+- `POST /api/v1/review/<id>/like/` — лайк
+- `POST /api/v1/review/<id>/dislike/` — дизлайк
+- `GET /api/v1/location/export/?type=csv` — експорт локацій у CSV (кешується)
 
-### 3. Apply migrations
+### Аутентифікація
+- Реєстрація: `/accounts/register/`
+- Вхід: `/accounts/login/`
+- Профіль: `/accounts/profile/`
 
-```sh
-python manage.py makemigrations
-python manage.py migrate
-```
-
-### 4. Create a superuser (optional, for admin access)
-
-```sh
-python manage.py createsuperuser
-```
-
-### 5. Run the development server
-
-```sh
-python manage.py runserver
-```
-
-## API Usage
-
-### Authentication
-
-All endpoints require authentication. Use session or basic authentication.
-
-### Endpoints
-
-- **Locations:**  
-  `GET /api/v1/location/`  
-  `POST /api/v1/location/`  
-  Supports filtering: `?rating=4&categories=1`  
-  Supports search: `?search=park`
-
-- **Categories:**  
-  `GET /api/v1/category/`  
-  `POST /api/v1/category/` (admin only)
-
-- **Reviews:**  
-  `GET /api/v1/review/`  
-  `POST /api/v1/review/`  
-  - Only one review per user per location
-
-- **Like/Dislike Review:**  
-  `POST /api/v1/review/<id>/like/`  
-  `POST /api/v1/review/<id>/dislike/`
-
-## Example: Create a Review
-
+### Приклад створення відгуку
 ```json
 POST /api/v1/review/
 {
   "rating": 5,
-  "comment": "Great place!",
+  "comment": "Чудове місце!",
   "location": 1
 }
 ```
-*The user is set automatically from the authenticated user.*
 
-## Filtering & Search
+## Вимоги
+- python: 3.10+
+- postgresql: 17
+- 
+- Docker, Docker Compose
 
-- Filter by rating: `/api/v1/location/?rating=4`
-- Filter by category: `/api/v1/location/?categories=2`
-- Search by name/description: `/api/v1/location/?search=park`
+## Налаштування змінних середовища
+- `DJANGO_DB_HOST`, `DJANGO_DB_PORT`, `DJANGO_DB_NAME`, `DJANGO_DB_USER`, `DJANGO_DB_PASSWORD` — для Postgres
 
-## Pagination
+---
 
-All list endpoints are paginated by default (10 items per page).
-
-## Requirements
-
-- Python 3.10+
-- Django 5.x
-- Django REST Framework
-- django-filter
-- psycopg2s
 
