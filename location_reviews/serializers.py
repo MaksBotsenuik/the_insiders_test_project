@@ -38,14 +38,14 @@ class LocationSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True, source='review_set')
     categories = serializers.PrimaryKeyRelatedField(
         queryset=LocationCategories.objects.all(),
-        many=True
+        many=True,
     )
     average_rating = serializers.ReadOnlyField()
 
     def create(self, validated_data):
         address_data = validated_data.pop('address')
+        address, created = Address.objects.get_or_create(**address_data)
         categories_data = validated_data.pop('categories')
-        address = Address.objects.create(**address_data)
         location = Location.objects.create(address=address, **validated_data)
         location.categories.set(categories_data)
         location.save()
@@ -55,9 +55,23 @@ class LocationSerializer(serializers.ModelSerializer):
         address_data = validated_data.pop('address', None)
         categories_data = validated_data.pop('categories', None)
         if address_data:
-            for attr, value in address_data.items():
-                setattr(instance.address, attr, value)
-            instance.address.save()
+            other_locations = Location.objects.filter(address=instance.address).exclude(pk=instance.pk)
+            address_changed = any(
+                getattr(instance.address, attr) != value for attr, value in address_data.items()
+            )
+            if other_locations.exists() and address_changed:
+                existing_address = Address.objects.filter(**address_data).first()
+                if existing_address:
+                    instance.address = existing_address
+                else:
+                    address_serializer = AddressSerializer(data=address_data)
+                    address_serializer.is_valid(raise_exception=True)
+                    new_address = address_serializer.save()
+                    instance.address = new_address
+            else:
+                address_serializer = AddressSerializer(instance.address, data=address_data, partial=True)
+                address_serializer.is_valid(raise_exception=True)
+                address_serializer.save()
         if categories_data:
             instance.categories.set(categories_data)
         for attr, value in validated_data.items():
