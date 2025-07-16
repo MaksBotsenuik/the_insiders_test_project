@@ -1,3 +1,4 @@
 .env
 
 migrations/
+location_reviews/migrations/

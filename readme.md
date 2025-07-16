@@ -35,9 +35,14 @@
    docker-compose down -v
    docker-compose up --build
    ```
-   > Це підніме Django, Postgres і Redis, застосує міграції та автоматично створить суперкористувача.
-4. **Відкрити Swagger:** [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
-5. **Увійти в адмінку:** [http://localhost:8000/admin/](http://localhost:8000/admin/) (логін/пароль з .env)
+   > Це підніме Django, Postgres і Redis та застосує міграції.
+4. **Створити суперкористувача вручну:**
+   ```sh
+   docker-compose exec web python manage.py createsuperuser
+   ```
+   > Використайте дані з .env або введіть свої при створенні.
+5. **Відкрити Swagger:** [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+6. **Увійти в адмінку:** [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
 ---
 
