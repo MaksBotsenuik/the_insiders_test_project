@@ -9,6 +9,9 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.house_number} {self.street}, {self.city}, {self.country}"
+        
+    class Meta:
+        ordering = ["pk"]
 
 
 class LocationCategories(models.Model):
@@ -16,6 +19,9 @@ class LocationCategories(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        ordering = ["pk"]
 
 
 class Location(models.Model):
@@ -31,7 +37,7 @@ class Location(models.Model):
     description = models.TextField(max_length=512, blank=True, verbose_name='location description')
     rating = models.IntegerField(choices=Rating, default=0)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, verbose_name='location address') 
-    categories = models.ManyToManyField(LocationCategories, null=True, verbose_name='location categories')
+    categories = models.ManyToManyField(LocationCategories, verbose_name='location categories')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name='location owner')
 
     @property

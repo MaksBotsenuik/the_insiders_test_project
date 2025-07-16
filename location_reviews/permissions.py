@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAdminUser
 
 class IsOwnerOrAdmin(BasePermission):
     """
@@ -10,13 +10,13 @@ class IsOwnerOrAdmin(BasePermission):
         if request.user and request.user.is_staff:
             return True
         return obj.user == request.user
-
-class IsAuthenticatedSafeMethod(BasePermission):
+    
+class IsAuthenticatedOrAdminForUnsafe(BasePermission):
     """
-    Allow safe methods for authenticated users.
+    Дозволяє SAFE_METHODS для автентифікованих, інші — лише для адмінів.
     """
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return request.user and request.user.is_authenticated
-        return False
+        return request.user and request.user.is_staff 
     

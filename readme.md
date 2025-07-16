@@ -18,32 +18,26 @@
    git clone <your-repo-url>
    cd inseders_test_task
    ```
-2. **Встановити залежності:**
-   ```sh
-   python -m venv venv
-   venv/Scripts/Activate
-   pip install -r requirments.txt
+2. **Створити файл .env у корені проєкту:**
+   ```env
+   DB_NAME=review_service
+   DB_USER=postgres
+   DB_PASSWORD=qweasdzxc123
+   DB_HOST=db
+   DB_PORT=5432 
+
+   DJANGO_SUPERUSER_USERNAME=admin
+   DJANGO_SUPERUSER_EMAIL=admin@example.com
+   DJANGO_SUPERUSER_PASSWORD=admin123
    ```
-3. **Запустити Redis через Docker Compose:**
+3. **Запустити всі сервіси через Docker Compose:**
    ```sh
-   docker compose up -d
+   docker-compose down -v
+   docker-compose up --build
    ```
-   > Це підніме лише Redis (порт 6379).
-4. **Запустити Postgres (локально або через власний контейнер).**
-   > Приклад для локального запуску Postgres:
-   > - Створіть БД, користувача та пароль відповідно до налаштувань у settings.py або змінних середовища.
-5. **Застосувати міграції:**
-   ```sh
-   python manage.py migrate
-   ```
-6. **Створити суперкористувача:**
-   ```sh
-   python manage.py createsuperuser
-   ```
-7. **Запустити сервер Django:**
-   ```sh
-   python manage.py runserver
-   ```
+   > Це підніме Django, Postgres і Redis, застосує міграції та автоматично створить суперкористувача.
+4. **Відкрити Swagger:** [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+5. **Увійти в адмінку:** [http://localhost:8000/admin/](http://localhost:8000/admin/) (логін/пароль з .env)
 
 ---
 
@@ -61,14 +55,10 @@
 - `POST /api/v1/review/<id>/like/` — лайк
 - `POST /api/v1/review/<id>/dislike/` — дизлайк
 - `GET /api/v1/location/export/?type=csv` — експорт локацій у CSV (кешується)
-- `GET /api/v1/location/export/` — експорт локацій у JSON (кешується)
-- `GET /api/v1/location/?` — експорт локацій у CSV (кешується)
-- `GET /api/v1/location/?rating=5&categories=1` - поверне всі локації з рейтингом 5 і категорією 1
-- `GET /api/v1/location/?search=Парк` - Пошук по назві або опису (згідно з search_fields: '=name', 'description').
 
 ### Аутентифікація
-- Реєстрація: `/accounts/register/`
-- Вхід: `/accounts/login/`
+- Реєстрація: `/register/`
+- Вхід: `/accounts//login/`
 - Профіль: `/accounts/profile/`
 
 ### Приклад створення відгуку
@@ -82,13 +72,29 @@ POST /api/v1/review/
 ```
 
 ## Вимоги
-- python: 3.10+
-- postgresql: 17
-- 
+- Python 3.10+
 - Docker, Docker Compose
 
 ## Налаштування змінних середовища
-- `DJANGO_DB_HOST`, `DJANGO_DB_PORT`, `DJANGO_DB_NAME`, `DJANGO_DB_USER`, `DJANGO_DB_PASSWORD` — для Postgres
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` — для Postgres
+- `REDIS_URL` — для Redis
+- `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`, `DJANGO_SUPERUSER_PASSWORD` — для автоматичного створення суперкористувача
+
+### Приклад .env
+```
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+DJANGO_SUPERUSER_PASSWORD=admin123
+```
+
+## Запуск через Docker Compose
+1. Створіть файл `.env` у корені проєкту з вмістом, як вище.
+2. Запустіть:
+   ```sh
+   docker-compose down -v
+   docker-compose up --build
+   ```
+3. Після запуску автоматично створиться суперкористувач з вказаними у .env даними.
 
 ---
 

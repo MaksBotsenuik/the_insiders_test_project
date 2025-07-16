@@ -1,6 +1,51 @@
+version: '3.9'
+
 services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=review_service
+      - DB_USER=postgres
+      - DB_PASSWORD=qweasdzxc123
+      - REDIS_URL=redis://redis:6379/1
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+      - DJANGO_SUPERUSER_PASSWORD=admin123
+    command: >
+      bash -c "export DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME &&
+               export DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL &&
+               export DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD &&
+               python manage.py makemigrations &&
+               python manage.py migrate &&
+               python manage.py createsuperuser --noinput --username=$DJANGO_SUPERUSER_USERNAME --email=$DJANGO_SUPERUSER_EMAIL &&
+               python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: review_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qweasdzxc123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7
     ports:
       - "6379:6379"
 
+volumes:
+  postgres_data:
+  
