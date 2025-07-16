@@ -9,12 +9,13 @@ from rest_framework.filters import SearchFilter
 from .models import Location, LocationCategories, Review
 from .serializers import LocationCategoriesSerializer, LocationSerializer, ReviewSerializer
 import pandas as pd
+from .permissions import IsOwnerOrAdmin
 
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     filter_backends = [DjangoFilterBackend, SearchFilter] 
     filterset_fields = ['rating', 'categories']
@@ -47,7 +48,7 @@ class LocationViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     authentication_classes = [SessionAuthentication, BasicAuthentication]
 
     @action(detail=True, methods=['post'])

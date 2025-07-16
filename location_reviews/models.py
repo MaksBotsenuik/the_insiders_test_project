@@ -29,10 +29,11 @@ class Location(models.Model):
 
     name = models.CharField(max_length=256, blank=False,  verbose_name='location name')
     description = models.TextField(max_length=512, blank=True, verbose_name='location description')
-    rating = models.IntegerField(choices=Rating, default=0) #probably should be calculated dynamicly
+    rating = models.IntegerField(choices=Rating, default=0)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, verbose_name='location address') 
     categories = models.ManyToManyField(LocationCategories, null=True, verbose_name='location categories')
-    
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name='location owner')
+
     @property
     def average_rating(self):
         reviews = self.review_set.all()

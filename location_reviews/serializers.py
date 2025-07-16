@@ -33,6 +33,20 @@ class ReviewSerializer(serializers.ModelSerializer):
             )
         ]
 
+    def create(self, validated_data):
+        review = super().create(validated_data)
+        location = review.location
+        location.rating = location.average_rating
+        location.save()
+        return review
+
+    def update(self, instance, validated_data):
+        review = super().update(instance, validated_data)
+        location = review.location
+        location.rating = location.average_rating
+        location.save()
+        return review
+
 class LocationSerializer(serializers.ModelSerializer):
     address = AddressSerializer(required=True)
     reviews = ReviewSerializer(many=True, read_only=True, source='review_set')
@@ -41,6 +55,11 @@ class LocationSerializer(serializers.ModelSerializer):
         many=True,
     )
     average_rating = serializers.ReadOnlyField()
+    user = serializers.PrimaryKeyRelatedField(
+        default=serializers.CurrentUserDefault(),
+        required=False,
+        read_only=True,
+    )
 
     def create(self, validated_data):
         address_data = validated_data.pop('address')
@@ -76,12 +95,11 @@ class LocationSerializer(serializers.ModelSerializer):
             instance.categories.set(categories_data)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.rating = instance.average_rating
         instance.save()
         return instance
 
     class Meta:
         model = Location
         fields = [
-            'id', 'name', 'description', 'address', 'categories', 'average_rating', 'reviews'
+            'id', 'name', 'description', 'address', 'categories', 'average_rating', 'reviews', 'user',
         ]
